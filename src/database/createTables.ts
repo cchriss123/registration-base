@@ -27,7 +27,6 @@ async function createUserTable() {
             email VARCHAR(255) NOT NULL,
             password VARCHAR(255) NOT NULL,
             user_type ENUM('super_admin', 'admin', 'user') NOT NULL,
-            phone_number VARCHAR(255),
             refresh_token VARCHAR(255),                
             is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
             modified DATETIME,

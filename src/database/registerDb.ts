@@ -28,5 +28,28 @@ export async function insertSuperAdmin() {
     await insertSyslog(syslog);
 }
 
+export async function saveAppendingUser(email: string, hashedPassword: string, token: string) {
+    const query = `
+        INSERT INTO PENDING_USER (email, password, token, created, modified)
+        VALUES (?, ?, ?, ?, NULL)
+        ON DUPLICATE KEY UPDATE 
+        password = VALUES(password),  
+        token = VALUES(token),
+        modified = NOW();
+    `;
 
+    // update modified may not work as expected
+
+    const [insertResult] = await poolDb.execute<ResultSetHeader>(query, [email, hashedPassword, token, new Date()]);
+
+    const syslog: Syslog = {
+        entity_id: insertResult.insertId.toString(),
+        entity_type: 'PENDING_USER',
+        action: 'CREATE',
+        title: 'Creation of Pending User',
+        description: 'A new pending user was created in the system.',
+        details: JSON.stringify({email}),
+    }
+    await insertSyslog(syslog);
+}
 
