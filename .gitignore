@@ -1,0 +1,17 @@
+node_modules/
+/dist
+
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*~
+.env
+
+# Operating System generated files
+.DS_Store
+
+Thumbs.db
