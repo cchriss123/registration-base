@@ -13,7 +13,7 @@ export interface Syslog {
 
 export async function insertSyslog(syslog: Syslog) {
 
-        const keys = Object.keys(syslog) as string[];
+        const keys = Object.keys(syslog);
         const placeholders = keys.map(() => '?').join(', ');
         const values = keys.map(key => syslog[key]);
         const query = `INSERT INTO SYSTEM_LOG (${keys.join(', ')}) VALUES (${placeholders})`;
