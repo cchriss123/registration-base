@@ -3,11 +3,12 @@ import {poolDb} from "./poolDb";
 export async function createTables() {
     await createPendingUserTable();
     await createUserTable();
+    await createSystemLogTable();
 }
 
 
 async function createPendingUserTable() {
-    const query = `
+    await poolDb.execute(`
         CREATE TABLE IF NOT EXISTS PENDING_USER (
             id INT PRIMARY KEY AUTO_INCREMENT,
             email VARCHAR(255) NOT NULL,
@@ -15,8 +16,7 @@ async function createPendingUserTable() {
             token VARCHAR(255) NOT NULL,
             created DATETIME DEFAULT CURRENT_TIMESTAMP
         )
-    `;
-    await poolDb.execute(query);
+    `);
 }
 
 async function createUserTable() {
@@ -36,6 +36,23 @@ async function createUserTable() {
             PRIMARY KEY (id),
             UNIQUE (email),
             UNIQUE (phone_number)
+        );
+    `);
+}
+
+async function createSystemLogTable() {
+    await poolDb.execute(`
+        CREATE TABLE IF NOT EXISTS SYSTEM_LOG (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            entity_id VARCHAR(255),  
+            entity_type VARCHAR(50),
+            action VARCHAR(50),
+            title VARCHAR(255),
+            description TEXT,
+            details TEXT,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            created_by INT DEFAULT NULL,
+            FOREIGN KEY (created_by) REFERENCES USER(id)
         );
     `);
 }
