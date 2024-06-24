@@ -53,3 +53,12 @@ export async function saveAppendingUser(email: string, hashedPassword: string, t
     await insertSyslog(syslog);
 }
 
+export async function selectUserByEmail(email: string): Promise<UserEmailRow | null> {
+    const [rows] = await poolDb.query<UserEmailRow[]>('SELECT email FROM USER WHERE email = ?', [email]);
+    return rows[0] || null;
+}
+
+interface UserEmailRow extends RowDataPacket {
+    id: string;
+}
+
