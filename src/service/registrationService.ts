@@ -7,7 +7,6 @@ interface RegistrationBody {
     password: string;
 }
 
-
 export async function appendUser(registrationBody: RegistrationBody) {
 
     if (!registrationBody.email)

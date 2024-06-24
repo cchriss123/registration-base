@@ -6,7 +6,6 @@ export async function createTables() {
     await createSystemLogTable();
 }
 
-
 async function createPendingUserTable() {
     await poolDb.execute(`
         CREATE TABLE IF NOT EXISTS PENDING_USER (
@@ -14,6 +13,7 @@ async function createPendingUserTable() {
             email VARCHAR(255) NOT NULL,
             password VARCHAR(255) NOT NULL,
             token VARCHAR(255) NOT NULL,
+            modified DATETIME,
             created DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     `);
