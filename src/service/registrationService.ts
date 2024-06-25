@@ -1,8 +1,9 @@
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import * as database from "../database/registerDb";
+import { sendMail } from "./emailService";
 
-interface RegistrationBody {
+export interface RegistrationBody {
     email: string;
     password: string;
 }
@@ -30,9 +31,12 @@ export async function appendUser(registrationBody: RegistrationBody) {
     const token = crypto.randomBytes(42).toString('hex');
     await database.saveAppendingUser(registrationBody.email, hashedPassword, token);
 
-    console.log('Email could not be sent');
 
-    // sendMail(token, registrationBody).catch(() => {
-    //     throw new Error('Email could not be sent');
-    // });
+    try {
+        await sendMail(token, registrationBody);
+        console.log('Verification email sent successfully');
+    } catch (error) {
+        console.error('Failed to send verification email:', error);
+        throw new Error('Email could not be sent');
+    }
 }
