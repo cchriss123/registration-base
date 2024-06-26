@@ -2,7 +2,7 @@ import {RegistrationBody} from "./registrationService";
 import sgMail from '@sendgrid/mail';
 
 export async function sendMail(token: string, registrationBody: RegistrationBody) : Promise<void> {
-    const clickHere = `http://${process.env.HOST}/api/auth/verify/${token}`;
+    const clickHere = `http://${process.env.HOST}/api/reg/verify/${token}`;
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
     const msg = {
