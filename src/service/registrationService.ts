@@ -3,6 +3,12 @@ import bcrypt from "bcrypt";
 import * as database from "../database/registerDb";
 import { sendMail } from "./emailService";
 
+export async function verifyUser(token: string) {
+
+    console.log("Here...")
+}
+
+
 export interface RegistrationBody {
     email: string;
     password: string;
