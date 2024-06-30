@@ -3,6 +3,7 @@ import cors from 'cors';
 import { createTables } from './database/createTables';
 import * as registerDatabase from './database/registerDb';
 import regRoutes from './controller/regController';
+import loginRoutes from './controller/loginController';
 import {customJsonParser} from "./utility/customJsonParser";
 
 const app = express();
@@ -13,7 +14,7 @@ app.use(cors());
 
 app.get('/api/ping', (_req: Request, res: Response) => res.send('pong'));
 app.use('/api/reg', regRoutes);
-
+app.use('/api/login', loginRoutes);
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
