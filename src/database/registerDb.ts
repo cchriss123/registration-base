@@ -1,7 +1,51 @@
 import {insertSyslog, Syslog} from "./syslogDb";
 import {poolDb} from "./poolDb";
-import {ResultSetHeader, RowDataPacket} from "mysql2";
+import {FieldPacket, ResultSetHeader, RowDataPacket} from "mysql2";
 import bcrypt from "bcrypt";
+
+
+export async function insertUser(email: string, password: string) {
+
+    const query = `INSERT INTO USER (email, password, user_type, is_deleted, created)
+        VALUES (?, ?, 'user', false, NOW()) `;
+
+    const [insertResult]: [ResultSetHeader, FieldPacket[]] = await poolDb.execute(query, [email, password]);
+    const id = insertResult.insertId.toString();
+
+    const syslog: Syslog = {
+        entity_id: id,
+        entity_type: 'USER',
+        action: 'CREATE',
+        title: 'Creation of User',
+        description: 'A new user was created in the system.',
+        details: JSON.stringify({email}),
+        created_by: id,
+    }
+    await insertSyslog(syslog);
+
+    const deleteQuery = `DELETE FROM PENDING_USER WHERE email = ?`;
+    await poolDb.execute(deleteQuery, [email]);
+
+    const deleteLog: Syslog = {
+        entity_id: id,
+        entity_type: 'PENDING_USER',
+        action: 'DELETE',
+        title: 'Deletion of Pending User',
+        description: 'A pending user was deleted after registration.',
+        details: JSON.stringify({email}),
+        created_by: id,
+    }
+    await insertSyslog(deleteLog);
+    console.log('A new user was created in the system');
+}
+
+export async function selectPendingUserByToken(token: string) {
+
+    const query = "SELECT email, password FROM PENDING_USER WHERE token = ?"
+    const [rows] = await poolDb.query<RowDataPacket[]>(query,token);
+    return rows[0] || null;
+}
+
 
 export async function insertSuperAdmin() {
 
@@ -38,7 +82,6 @@ export async function saveAppendingUser(email: string, hashedPassword: string, t
         modified = NOW();
     `;
 
-    // update modified may not work as expected
 
     const [insertResult] = await poolDb.execute<ResultSetHeader>(query, [email, hashedPassword, token, new Date()]);
 

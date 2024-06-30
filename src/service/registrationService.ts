@@ -5,7 +5,11 @@ import { sendMail } from "./emailService";
 
 export async function verifyUser(token: string) {
 
-    console.log("Here...")
+    const pendingUser = await database.selectPendingUserByToken(token);
+    if (!pendingUser)
+        throw new Error('Token not found');
+
+    await database.insertUser(pendingUser.email, pendingUser.password);
 }
 
 
