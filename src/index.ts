@@ -11,7 +11,6 @@ const PORT = process.env.PORT || 8097;
 app.use(customJsonParser);
 app.use(cors());
 
-
 app.get('/api/ping', (_req: Request, res: Response) => res.send('pong'));
 app.use('/api/reg', regRoutes);
 
