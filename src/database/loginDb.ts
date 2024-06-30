@@ -17,8 +17,9 @@ export async function saveRefreshToken(refreshToken: string, id: string) : Promi
     await syslogDb.insertSyslog(syslog);
 }
 
-export async function selectIdByEmail(email: string) {
-    //TODO
+export async function selectIdByEmail(email: string) : Promise<string | null> {
+    const [rows] = await poolDb.query<RowDataPacket[]>('SELECT id FROM USER WHERE email = ? AND is_deleted = false', [email]);
+    return rows[0].id || null;
 }
 
 export async function selectUserPasswordByEmail(email: string) : Promise<string | null> {
