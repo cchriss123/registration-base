@@ -3,6 +3,15 @@ import * as syslogDb from './syslogDb';
 import {Syslog} from "./syslogDb";
 import {RowDataPacket} from "mysql2";
 
+interface UserRow extends RowDataPacket {
+    refresh_token: string;
+}
+
+export async function getRefreshTokenById(id: string): Promise<string | null> {
+    const [rows] = await poolDb.query<UserRow[]>('SELECT refresh_token FROM user WHERE id = ? AND is_deleted = false', [id]);
+    return rows[0].refresh_token || null;
+}
+
 export async function saveRefreshToken(refreshToken: string, id: string) : Promise<void> {
     await poolDb.execute('UPDATE USER SET refresh_token = ? WHERE id = ?', [refreshToken, id]);
 

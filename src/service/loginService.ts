@@ -3,6 +3,29 @@ import * as database from '../database/loginDb';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+export async function refreshToken(token: string): Promise<{ accessToken: string }> {
+
+    if (!token) {
+        throw new Error('Refresh token must be provided');
+    }
+
+    let id: string;
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as jwt.JwtPayload;
+        id = decoded.id;
+    } catch (e) {
+        throw new Error('Invalid or expired token');
+    }
+    const storedToken = await database.getRefreshTokenById(id);
+    if (storedToken !== token)
+        throw new Error('Invalid or mismatching token');
+
+    const accessToken = jwt.sign({ id: id, type: 'access' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return { accessToken };
+}
+
+
 interface loginBody {
     email: string;
     password: string;
