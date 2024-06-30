@@ -5,7 +5,7 @@ export interface AuthenticatedRequest extends Request {
     userId?: string;
 }
 
-export function verifyAccessToken(req: AuthenticatedRequest, res: Response, next: NextFunction): Response | void {
+export function verifyAccessToken(req: any, res: Response, next: NextFunction): Response | void {
     const authorization = req.headers.authorization;
     if (!authorization) {
         return res.status(401).json({ error: 'Authorization header must be provided' });

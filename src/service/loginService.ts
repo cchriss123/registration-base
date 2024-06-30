@@ -61,3 +61,7 @@ export async function login(body: loginBody) : Promise<{accessToken: string, ref
 
     return { accessToken, refreshToken };
 }
+
+export async function logout(id: string) : Promise<void> {
+    await database.deleteRefreshTokenById(id);
+}

@@ -1,7 +1,7 @@
 import { poolDb } from './poolDb';
 import * as syslogDb from './syslogDb';
 import {Syslog} from "./syslogDb";
-import {RowDataPacket} from "mysql2";
+import {ResultSetHeader, RowDataPacket} from "mysql2";
 
 interface UserRow extends RowDataPacket {
     refresh_token: string;
@@ -35,4 +35,22 @@ export async function selectUserPasswordByEmail(email: string) : Promise<string 
     const query = 'SELECT password FROM USER WHERE email = ? AND is_deleted = false';
     const [rows] = await poolDb.query<RowDataPacket[]>(query, [email]);
     return rows[0].password || null;
+}
+
+export async function deleteRefreshTokenById(id: string) {
+
+    const [result] = await poolDb.query<ResultSetHeader>(`
+    UPDATE USER SET refresh_token = NULL WHERE id = ? AND is_deleted = false AND refresh_token IS NOT NULL`, [id]);
+
+    if (result.affectedRows === 0) return;
+
+    const syslog: Syslog = {
+        entity_id: id,
+        entity_type: 'USER',
+        action: 'UPDATE',
+        title: 'Refresh Token Update',
+        description: 'Someone logged out and the refresh token was deleted.',
+        created_by: id
+    }
+    await syslogDb.insertSyslog(syslog);
 }
