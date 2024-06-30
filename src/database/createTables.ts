@@ -1,5 +1,6 @@
 import {poolDb} from "./poolDb";
 
+
 export async function createTables() {
     await createPendingUserTable();
     await createUserTable();
@@ -33,8 +34,7 @@ async function createUserTable() {
             created DATETIME DEFAULT CURRENT_TIMESTAMP,
             modified_by INT,
             PRIMARY KEY (id),
-            UNIQUE (email),
-            UNIQUE (phone_number)
+            UNIQUE (email)
         );
     `);
 }
